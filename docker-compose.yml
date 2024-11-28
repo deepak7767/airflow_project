@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  airflow:
+    build: .
+    image: airflow_docker_pipeline
+    container_name: airflow_container
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    ports:
+      - "8080:8080"
+    command: ["standalone"]
+
+  airflow-db-init:
+    image: airflow_docker_pipeline
+    depends_on:
+      - airflow
+    command: ["airflow", "db", "init"]
